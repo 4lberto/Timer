@@ -1,0 +1,129 @@
+<!-- Developed by alberto.moratilla@gmail.com on January 2011
+http://about.me/alberto.moratilla
+A Chrome's basic extension example
+Icon taken from: http://www.famfamfam.com/lab/icons/silk/-->
+<html>
+    <script>
+
+        console.log("HELLO"); // THIS NEVER GETS DISPLAYED
+        var tiempo_inicio = new Date;	//Check the time when chrome loads
+
+        chrome.browserAction.setTitle({title:"Click to open"});
+        reloj();
+
+        if (!localStorage.COT_uses)
+            localStorage.COT_uses = 1;
+        else
+            localStorage.COT_uses = (parseInt(localStorage.COT_uses))+1;
+
+
+        function reloj()
+        {
+            badge();
+            var t=setTimeout("reloj()",5000); //Refresh badget every 5 seconds
+        }
+
+
+        function badge() {
+	
+            var tiempo_actual = new Date();
+            var texto = formatBadge(tiempo_actual-tiempo_inicio);
+	
+            chrome.browserAction.setBadgeText({text:texto});
+            chrome.browserAction.setBadgeBackgroundColor({color:[0,0,255,255]});
+						
+        }
+
+
+        //Transforms from ms to hh:mm:ss format
+        function formatTime(ms)
+        {
+            var horas = Math.floor(ms / (1000*60*60));
+
+            ms = ms%(1000*60*60);
+            var minutos = Math.floor(ms / (1000*60));
+            minutos=(minutos <=9)?"0"+minutos:minutos;
+            ms = ms%(1000*60);
+            var segundos = Math.floor(ms / (1000));
+            segundos=(segundos <=9)?"0"+segundos:segundos;
+            ms = ms%(1000);
+
+            return (horas + ":" + minutos + ":" + segundos);
+        }
+                        
+                        
+        //Transforms from ms to hh:mm format to be shown on the badget
+        function formatBadge(ms)
+        {
+            var horas = Math.floor(ms / (1000*60*60));
+            ms = ms%(1000*60*60);
+            var minutos = Math.floor(ms / (1000*60));
+            minutos=(minutos <=9)?"0"+minutos:minutos;
+            ms = ms%(1000*60);
+            var salida = (horas + ":" + minutos);
+	
+            return salida.slice(0,4);
+        }
+
+
+        //Event when de extension is loaded: whether it is chrome who start or the user who enables the extension
+        window.onload = function() {
+
+            
+            if (!localStorage.onloadCount)
+                localStorage.onloadCount = 1;
+            else
+                
+            localStorage.onloadCount++;
+
+    };
+
+    function guardaEstadisticas()
+    {
+
+        //When extension ends, adds the time its been used
+        var tiempo_instancia= new tiempo(tiempo_inicio.valueOf(), (new Date()).valueOf());
+        if(!localStorage.COT_history)
+        {
+            localStorage.COT_history = "[" + JSON.stringify( tiempo_instancia ) + "]";
+        }
+        else
+        {
+            var historia = JSON.parse(localStorage.COT_history);
+
+            historia.push(tiempo_instancia);
+            localStorage.COT_history = JSON.stringify(historia);
+            console.log("Añadido:" + JSON.stringify(historia));
+        }
+    }
+
+    
+
+
+
+
+    //Event when extension closes.
+    window.onunload =
+        function () {
+        guardaEstadisticas();
+
+    };
+
+
+
+
+    //Time object
+    function tiempo (inicio, fin)
+    {
+        this.inicio = inicio;
+        this.fin = fin;
+    }
+
+
+
+
+
+
+
+    </script>
+</html>

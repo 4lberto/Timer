@@ -1,0 +1,91 @@
+<!-- Developed by alberto.moratilla@gmail.com on January 2011
+http://about.me/alberto.moratilla
+A Chrome's basic extension example
+Icon taken from: http://www.famfamfam.com/lab/icons/silk/-->
+<html>
+    <head>
+        <title>Timer's Popup
+        </title>
+
+        <script type="text/javascript">
+            var background = chrome.extension.getBackgroundPage();
+
+
+            function pintaTiempo()
+            {
+                var tiempo_actual = new Date();
+                var tiempo_inicio = background.tiempo_inicio;
+                //document.write(formatTime(tiempo_actual-tiempo_inicio));
+                
+                document.getElementById('tiempo').innerHTML = background.formatTime(tiempo_actual-tiempo_inicio);
+            }
+
+        
+            
+            //Resets start time
+            function resetCounter()
+            {
+                background.guardaEstadisticas();    //Before reset the initial time
+                background.tiempo_inicio = new Date();
+                background.badge();
+            }
+			
+			
+            function reloj()
+            {
+                pintaTiempo();
+                var t=setTimeout("reloj()",500); //Refresh every second
+            }
+			
+            reloj();
+
+        </script>
+        <style>
+            body{
+                width: 5em;
+                text-align: center;
+                font-family: sans-serif;
+
+            }
+            h1{
+                font-size:medium;
+                font-family: sans-serif;
+                color:brown;
+                margin: 0em;
+            }
+
+
+            #mensaje
+            {
+                font-size: small;
+                color:slategray;
+
+            }
+            #tiempo
+            {
+                font-size: large;
+                font-family: sans-serif;
+            }
+            #reset
+            {
+                text-align:center;
+                font-size: small;
+
+            }
+
+        </style>
+    </head>
+    <body>
+        <h1>Timer</h1>
+        <p id="mensaje">Chrome was opened for:</p>
+        <div id="tiempo"><script> reloj();</script></div>
+        <p id="reset"><a href="#" onclick="resetCounter()">Reset</a> <br/> <a href="history.html">Usage Stats</a></p>
+
+    </body>
+</html>
+
+
+
+
+
+
